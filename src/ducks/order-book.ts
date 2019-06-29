@@ -190,8 +190,6 @@ export const reducer: Reducer<OrderBookState> = (state = initialState, action: A
       throw new Error(`Order not found`);
     }
 
-    console.log('REMOVE ME! index', index);
-
     const nextEntries = [...target.slice(0, index), ...target.slice(index + 1)];
 
     if (side === 'Buy') {

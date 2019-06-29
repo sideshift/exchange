@@ -7,6 +7,7 @@ exports.ORDER_REST_ACTION = `${exports.NAME}/ORDER_REST_ACTION`;
 exports.ORDER_FILL_ACTION = `${exports.NAME}/ORDER_FILL_ACTION`;
 exports.ORDER_PARTIAL_FILL_ACTION = `${exports.NAME}/ORDER_PARTIAL_FILL_ACTION`;
 exports.ORDER_CANCEL_ACTION = `${exports.NAME}/ORDER_CANCEL_ACTION`;
+exports.ORDER_STATUSES = ['New', 'PartiallyFilled', 'Filled', 'Canceled'];
 exports.orderRestAction = (payload) => utils_1.createAction(exports.ORDER_REST_ACTION, payload);
 exports.isOrderRestAction = (action) => action.type === exports.ORDER_REST_ACTION;
 exports.OrderFillAction = (payload) => utils_1.createAction(exports.ORDER_FILL_ACTION, payload);
@@ -17,6 +18,17 @@ exports.orderCancelAction = (payload) => utils_1.createAction(exports.ORDER_CANC
 exports.isOrderCancelAction = (action) => action.type === exports.ORDER_CANCEL_ACTION;
 exports.initialState = {};
 const getState = (state) => state[exports.NAME];
+const validatePreviousStatus = (previous, next) => {
+    const valid = {
+        PartiallyFilled: ['New', 'PartiallyFilled'],
+        Filled: ['New', 'PartiallyFilled'],
+        Canceled: ['New', 'PartiallyFilled', 'Filled'],
+    };
+    const isValid = valid[next].includes(previous);
+    if (!isValid) {
+        throw new Error(`Cannot transition from ${previous} to ${next}`);
+    }
+};
 exports.reducer = (state = exports.initialState, action) => {
     if (exports.isOrderRestAction(action)) {
         const { id, price, qty, side } = action.payload;
@@ -40,9 +52,7 @@ exports.reducer = (state = exports.initialState, action) => {
         if (prevOrder === undefined) {
             throw new Error(`Order not found`);
         }
-        if (!['New', 'PartiallyFilled'].includes(prevOrder.status)) {
-            throw new Error(`Cannot fill order in status ${prevOrder.status}`);
-        }
+        validatePreviousStatus(prevOrder.status, 'Filled');
         const nextOrder = {
             ...prevOrder,
             leavesQty: '0',
@@ -59,9 +69,7 @@ exports.reducer = (state = exports.initialState, action) => {
         if (prevOrder === undefined) {
             throw new Error(`Order not found`);
         }
-        if (!['New', 'PartiallyFilled'].includes(prevOrder.status)) {
-            throw new Error(`Invalid previous status: ${prevOrder.status}`);
-        }
+        validatePreviousStatus(prevOrder.status, 'PartiallyFilled');
         const nextLeavesQty = utils_1.ns.minus(prevOrder.leavesQty, amount);
         if (utils_1.ns.lte(nextLeavesQty, '0')) {
             throw new Error(`leavesQty would become <= 0`);
@@ -82,10 +90,7 @@ exports.reducer = (state = exports.initialState, action) => {
         if (prevOrder === undefined) {
             throw new Error(`Order not found`);
         }
-        // TODO: <const>
-        if (!['New', 'PartiallyFilled', 'Filled'].includes(prevOrder.status)) {
-            throw new Error(`Cannot cancel order in status ${prevOrder.status}`);
-        }
+        validatePreviousStatus(prevOrder.status, 'Canceled');
         const nextOrder = {
             ...prevOrder,
             leavesQty: '0',

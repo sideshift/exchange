@@ -36,40 +36,35 @@ const parseOrderBookEntry = (value: string) => pick(parseOrder(value), ['orderId
 
 describe('OrderBook', () => {
   describe('reducer', () => {
-    it('Should handle insert bid at bottom', () => {
+    it('Should handle insert bid at top', () => {
       const prevState: OrderBookState = {
         ...initialState,
-        bids: [
-          {
-            orderId: '10 @ 200',
-            size: '10',
-            price: '200',
-          },
-        ],
+        bids: [parseOrderBookEntry('Buy 10 @ 200')],
       };
 
-      const nextState = reducer(
-        prevState,
-        orderBookInsertAction({
-          orderId: '20 @ 50',
-          side: 'Buy',
-          price: '50',
-          size: '20',
-        })
-      );
+      const nextState = reducer(prevState, orderBookInsertAction(parseOrder('Buy 20 @ 50')));
+
+      const expectedState: OrderBookState = {
+        bids: [parseOrderBookEntry('Buy 10 @ 200'), parseOrderBookEntry('Buy 20 @ 50')],
+        offers: [],
+      };
+
+      expect(nextState).toEqual(expectedState);
+    });
+
+    it('Should handle insert bid in middle', () => {
+      const prevState: OrderBookState = {
+        ...initialState,
+        bids: [parseOrderBookEntry('Buy 20 @ 200'), parseOrderBookEntry('Buy 10 @ 100')],
+      };
+
+      const nextState = reducer(prevState, orderBookInsertAction(parseOrder('Buy 15 @ 150')));
 
       const expectedState: OrderBookState = {
         bids: [
-          {
-            orderId: '10 @ 200',
-            size: '10',
-            price: '200',
-          },
-          {
-            orderId: '20 @ 50',
-            price: '50',
-            size: '20',
-          },
+          parseOrderBookEntry('Buy 20 @ 200'),
+          parseOrderBookEntry('Buy 15 @ 150'),
+          parseOrderBookEntry('Buy 10 @ 100'),
         ],
         offers: [],
       };
@@ -77,36 +72,69 @@ describe('OrderBook', () => {
       expect(nextState).toEqual(expectedState);
     });
 
-    it('Should handle insert bid at top', () => {
+    it('Should handle insert bid at bottom', () => {
       const prevState: OrderBookState = {
         ...initialState,
         bids: [parseOrderBookEntry('Buy 10 @ 200')],
       };
 
-      const nextState = reducer(
-        prevState,
-        orderBookInsertAction({
-          orderId: 'Buy 20 @ 50',
-          side: 'Buy',
-          price: '50',
-          size: '20',
-        })
-      );
+      const nextState = reducer(prevState, orderBookInsertAction(parseOrder('Buy 20 @ 50')));
 
       const expectedState: OrderBookState = {
-        bids: [
-          {
-            orderId: 'Buy 10 @ 200',
-            size: '10',
-            price: '200',
-          },
-          {
-            orderId: 'Buy 20 @ 50',
-            price: '50',
-            size: '20',
-          },
+        ...initialState,
+        bids: [parseOrderBookEntry('Buy 10 @ 200'), parseOrderBookEntry('Buy 20 @ 50')],
+      };
+
+      expect(nextState).toEqual(expectedState);
+    });
+
+    it('Should handle insert offer at top', () => {
+      const prevState: OrderBookState = {
+        ...initialState,
+        offers: [parseOrderBookEntry('Sell 20 @ 200')],
+      };
+
+      const nextState = reducer(prevState, orderBookInsertAction(parseOrder('Sell 10 @ 100')));
+
+      const expectedState: OrderBookState = {
+        ...initialState,
+        offers: [parseOrderBookEntry('Sell 10 @ 100'), parseOrderBookEntry('Sell 20 @ 200')],
+      };
+
+      expect(nextState).toEqual(expectedState);
+    });
+
+    it('Should handle insert offer in middle', () => {
+      const prevState: OrderBookState = {
+        ...initialState,
+        offers: [parseOrderBookEntry('Sell 10 @ 100'), parseOrderBookEntry('Sell 20 @ 200')],
+      };
+
+      const nextState = reducer(prevState, orderBookInsertAction(parseOrder('Sell 15 @ 150')));
+
+      const expectedState: OrderBookState = {
+        ...initialState,
+        offers: [
+          parseOrderBookEntry('Sell 10 @ 100'),
+          parseOrderBookEntry('Sell 15 @ 150'),
+          parseOrderBookEntry('Sell 20 @ 200'),
         ],
-        offers: [],
+      };
+
+      expect(nextState).toEqual(expectedState);
+    });
+
+    it('Should handle insert offer at bottom', () => {
+      const prevState: OrderBookState = {
+        ...initialState,
+        offers: [parseOrderBookEntry('Sell 10 @ 100')],
+      };
+
+      const nextState = reducer(prevState, orderBookInsertAction(parseOrder('Sell 20 @ 200')));
+
+      const expectedState: OrderBookState = {
+        ...initialState,
+        offers: [parseOrderBookEntry('Sell 10 @ 100'), parseOrderBookEntry('Sell 20 @ 200')],
       };
 
       expect(nextState).toEqual(expectedState);

@@ -14,7 +14,10 @@ exports.ns = {
         .minus(b)
         .toString(),
     min: (...args) => bignumber_js_1.default.min(...args.map(exports.n)).toString(),
+    sum: (...args) => bignumber_js_1.default.sum(...args.map(exports.n)).toString(),
     gt: (a, b) => exports.n(a).gt(b),
     lt: (a, b) => exports.n(a).lt(b),
+    lte: (a, b) => exports.n(a).lte(b),
     eq: (a, b) => exports.n(a).eq(b),
+    cmp: (a, b) => exports.n(a).comparedTo(b),
 };

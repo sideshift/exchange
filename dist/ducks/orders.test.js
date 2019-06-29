@@ -50,5 +50,91 @@ describe('Orders', () => {
                 expect(nextState).toEqual(expectedState);
             });
         });
+        describe('Fill', () => {
+            it('Should fill order', () => {
+                const prevState = {
+                    ...orders_1.initialState,
+                    'Buy 10 @ 123': {
+                        id: 'Buy 10 @ 123',
+                        leavesQty: '10',
+                        price: '123',
+                        qty: '10',
+                        side: 'Buy',
+                        status: 'New',
+                    },
+                };
+                const nextState = orders_1.reducer(prevState, orders_1.OrderFillAction({ id: 'Buy 10 @ 123' }));
+                const expectedState = {
+                    ...prevState,
+                    'Buy 10 @ 123': {
+                        id: 'Buy 10 @ 123',
+                        leavesQty: '0',
+                        price: '123',
+                        qty: '10',
+                        side: 'Buy',
+                        status: 'Filled',
+                    },
+                };
+                expect(nextState).toEqual(expectedState);
+            });
+        });
+        describe('Partially fill', () => {
+            it('Should partially fill order', () => {
+                const id = 'Buy 10 @ 123';
+                const prevState = {
+                    ...orders_1.initialState,
+                    [id]: {
+                        id,
+                        leavesQty: '10',
+                        price: '123',
+                        qty: '10',
+                        side: 'Buy',
+                        status: 'New',
+                    },
+                };
+                const nextState = orders_1.reducer(prevState, orders_1.OrderPartialFillAction({ id, amount: '3' }));
+                const expectedState = {
+                    ...prevState,
+                    [id]: {
+                        id,
+                        leavesQty: '7',
+                        price: '123',
+                        qty: '10',
+                        side: 'Buy',
+                        status: 'PartiallyFilled',
+                    },
+                };
+                expect(nextState).toEqual(expectedState);
+            });
+        });
+        describe('Cancel', () => {
+            it('Should cancel order', () => {
+                const id = 'Buy 10 @ 123';
+                const prevState = {
+                    ...orders_1.initialState,
+                    [id]: {
+                        id,
+                        leavesQty: '5',
+                        price: '123',
+                        qty: '10',
+                        side: 'Buy',
+                        status: 'PartiallyFilled',
+                    },
+                };
+                const nextState = orders_1.reducer(prevState, orders_1.orderCancelAction({ id }));
+                const expectedState = {
+                    ...prevState,
+                    [id]: {
+                        id,
+                        leavesQty: '0',
+                        price: '123',
+                        qty: '10',
+                        side: 'Buy',
+                        status: 'Canceled',
+                    },
+                };
+                expect(nextState).toEqual(expectedState);
+            });
+        });
     });
 });

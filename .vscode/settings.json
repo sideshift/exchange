@@ -1,5 +1,6 @@
 {
     "editor.formatOnSave": true,
     "editor.formatOnPaste": true,
-    "prettier.singleQuote": true
+    "prettier.singleQuote": true,
+    "typescript.tsdk": "node_modules/typescript/lib"
 }

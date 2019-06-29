@@ -126,12 +126,18 @@ export const reducer: Reducer<OrdersState> = (state = initialState, action: Acti
     }
 
     if (!['New', 'PartiallyFilled'].includes(prevOrder.status)) {
-      throw new Error(`Cannot partially fill order in status ${prevOrder.status}`);
+      throw new Error(`Invalid previous status: ${prevOrder.status}`);
+    }
+
+    const nextLeavesQty = ns.minus(prevOrder.leavesQty, amount);
+
+    if (ns.lte(nextLeavesQty, '0')) {
+      throw new Error(`leavesQty would become <= 0`);
     }
 
     const nextOrder: Order = {
       ...prevOrder,
-      leavesQty: ns.minus(prevOrder.leavesQty, amount),
+      leavesQty: nextLeavesQty,
       status: 'PartiallyFilled',
     };
 
@@ -151,8 +157,8 @@ export const reducer: Reducer<OrdersState> = (state = initialState, action: Acti
     }
 
     // TODO: <const>
-    if (!['New', 'PartiallyFilled', 'Filled'].includes(prevOrder.status)) {
-      throw new Error(`Cannot cancel order in status ${prevOrder.status}`);
+    if (!['New', 'PartiallyFilled'].includes(prevOrder.status)) {
+      throw new Error(`Invalid previous status: ${prevOrder.status}`);
     }
 
     const nextOrder: Order = {

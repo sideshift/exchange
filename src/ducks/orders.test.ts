@@ -1,4 +1,14 @@
-import { reducer, initialState, OrderRestActionPayload, Order, orderRestAction, OrdersState } from './orders';
+import {
+  reducer,
+  initialState,
+  OrderRestActionPayload,
+  Order,
+  orderRestAction,
+  OrdersState,
+  OrderFillAction,
+  OrderPartialFillAction,
+  orderCancelAction,
+} from './orders';
 import { upperFirst } from 'lodash';
 import { Side } from '../types';
 
@@ -52,6 +62,106 @@ describe('Orders', () => {
             qty: '20',
             side: 'Buy',
             status: 'New',
+          } as Order,
+        };
+
+        expect(nextState).toEqual(expectedState);
+      });
+    });
+
+    describe('Fill', () => {
+      it('Should fill order', () => {
+        const prevState: OrdersState = {
+          ...initialState,
+          'Buy 10 @ 123': {
+            id: 'Buy 10 @ 123',
+            leavesQty: '10',
+            price: '123',
+            qty: '10',
+            side: 'Buy',
+            status: 'New',
+          } as Order,
+        };
+
+        const nextState = reducer(prevState, OrderFillAction({ id: 'Buy 10 @ 123' }));
+
+        const expectedState: OrdersState = {
+          ...prevState,
+          'Buy 10 @ 123': {
+            id: 'Buy 10 @ 123',
+            leavesQty: '0',
+            price: '123',
+            qty: '10',
+            side: 'Buy',
+            status: 'Filled',
+          } as Order,
+        };
+
+        expect(nextState).toEqual(expectedState);
+      });
+    });
+
+    describe('Partially fill', () => {
+      it('Should partially fill order', () => {
+        const id = 'Buy 10 @ 123';
+
+        const prevState: OrdersState = {
+          ...initialState,
+          [id]: {
+            id,
+            leavesQty: '10',
+            price: '123',
+            qty: '10',
+            side: 'Buy',
+            status: 'New',
+          } as Order,
+        };
+
+        const nextState = reducer(prevState, OrderPartialFillAction({ id, amount: '3' }));
+
+        const expectedState: OrdersState = {
+          ...prevState,
+          [id]: {
+            id,
+            leavesQty: '7',
+            price: '123',
+            qty: '10',
+            side: 'Buy',
+            status: 'PartiallyFilled',
+          } as Order,
+        };
+
+        expect(nextState).toEqual(expectedState);
+      });
+    });
+
+    describe('Cancel', () => {
+      it('Should cancel order', () => {
+        const id = 'Buy 10 @ 123';
+
+        const prevState: OrdersState = {
+          ...initialState,
+          [id]: {
+            id,
+            leavesQty: '5',
+            price: '123',
+            qty: '10',
+            side: 'Buy',
+            status: 'PartiallyFilled',
+          } as Order,
+        };
+
+        const nextState = reducer(prevState, orderCancelAction({ id }));
+
+        const expectedState: OrdersState = {
+          ...prevState,
+          [id]: {
+            id,
+            leavesQty: '0',
+            price: '123',
+            qty: '10',
+            side: 'Buy',
+            status: 'Canceled',
           } as Order,
         };
 

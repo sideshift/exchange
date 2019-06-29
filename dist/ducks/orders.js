@@ -60,11 +60,15 @@ exports.reducer = (state = exports.initialState, action) => {
             throw new Error(`Order not found`);
         }
         if (!['New', 'PartiallyFilled'].includes(prevOrder.status)) {
-            throw new Error(`Cannot partially fill order in status ${prevOrder.status}`);
+            throw new Error(`Invalid previous status: ${prevOrder.status}`);
+        }
+        const nextLeavesQty = utils_1.ns.minus(prevOrder.leavesQty, amount);
+        if (utils_1.ns.lte(nextLeavesQty, '0')) {
+            throw new Error(`leavesQty would become <= 0`);
         }
         const nextOrder = {
             ...prevOrder,
-            leavesQty: utils_1.ns.minus(prevOrder.leavesQty, amount),
+            leavesQty: nextLeavesQty,
             status: 'PartiallyFilled',
         };
         return {

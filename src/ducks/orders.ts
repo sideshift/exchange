@@ -11,7 +11,9 @@ export const ORDER_FILL_ACTION = `${NAME}/ORDER_FILL_ACTION`;
 export const ORDER_PARTIAL_FILL_ACTION = `${NAME}/ORDER_PARTIAL_FILL_ACTION`;
 export const ORDER_CANCEL_ACTION = `${NAME}/ORDER_CANCEL_ACTION`;
 
-export type OrderStatus = 'New' | 'PartiallyFilled' | 'Filled' | 'Canceled';
+export const ORDER_STATUSES = <const>['New', 'PartiallyFilled', 'Filled', 'Canceled'];
+
+export type OrderStatus = typeof ORDER_STATUSES[number];
 
 export interface Order {
   readonly id: string;
@@ -71,6 +73,20 @@ export const initialState: OrdersState = {};
 
 const getState = (state: any) => state[NAME] as OrdersState;
 
+const validatePreviousStatus = (previous: OrderStatus, next: Exclude<OrderStatus, 'New'>) => {
+  const valid: { [status in Exclude<OrderStatus, 'New'>]: OrderStatus[] } = {
+    PartiallyFilled: ['New', 'PartiallyFilled'],
+    Filled: ['New', 'PartiallyFilled'],
+    Canceled: ['New', 'PartiallyFilled', 'Filled'],
+  };
+
+  const isValid = valid[next].includes(previous);
+
+  if (!isValid) {
+    throw new Error(`Cannot transition from ${previous} to ${next}`);
+  }
+};
+
 export const reducer: Reducer<OrdersState> = (state = initialState, action: Action) => {
   if (isOrderRestAction(action)) {
     const { id, price, qty, side } = action.payload;
@@ -100,9 +116,7 @@ export const reducer: Reducer<OrdersState> = (state = initialState, action: Acti
       throw new Error(`Order not found`);
     }
 
-    if (!['New', 'PartiallyFilled'].includes(prevOrder.status)) {
-      throw new Error(`Cannot fill order in status ${prevOrder.status}`);
-    }
+    validatePreviousStatus(prevOrder.status, 'Filled');
 
     const nextOrder: Order = {
       ...prevOrder,
@@ -125,9 +139,7 @@ export const reducer: Reducer<OrdersState> = (state = initialState, action: Acti
       throw new Error(`Order not found`);
     }
 
-    if (!['New', 'PartiallyFilled'].includes(prevOrder.status)) {
-      throw new Error(`Invalid previous status: ${prevOrder.status}`);
-    }
+    validatePreviousStatus(prevOrder.status, 'PartiallyFilled');
 
     const nextLeavesQty = ns.minus(prevOrder.leavesQty, amount);
 
@@ -156,10 +168,7 @@ export const reducer: Reducer<OrdersState> = (state = initialState, action: Acti
       throw new Error(`Order not found`);
     }
 
-    // TODO: <const>
-    if (!['New', 'PartiallyFilled'].includes(prevOrder.status)) {
-      throw new Error(`Invalid previous status: ${prevOrder.status}`);
-    }
+    validatePreviousStatus(prevOrder.status, 'Canceled');
 
     const nextOrder: Order = {
       ...prevOrder,

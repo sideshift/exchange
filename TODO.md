@@ -1,1 +1,3 @@
+- [ ] Ticker reducer
 - [ ] Convert everything to export enum Derp = { Buy: Side.Buy, Sell: 'SELL };
+- [ ] Look at github.com/ccxt

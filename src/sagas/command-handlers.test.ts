@@ -10,8 +10,6 @@ import { OrderSide } from '../types';
 describe('Command handlers', () => {
   describe('placeOrderCommandHandler', () => {
     it('should pass vector 1', () => {
-      // NOTE: Yolo test while I figure out how to do this
-
       const command = placeOrderCommand({
         side: OrderSide.Buy,
         price: '100',

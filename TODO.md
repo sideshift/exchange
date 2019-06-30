@@ -1,0 +1,1 @@
+- [ ] Convert everything to export enum Derp = { Buy: 'BUY', Sell: 'SELL };

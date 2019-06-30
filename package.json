@@ -6,7 +6,8 @@
     "test": "jest",
     "test:watch": "npm run test -- --watchAll",
     "build:tsc": "tsc",
-    "build:tsc:watch": "npm run build:tsc -- --watch"
+    "build:tsc:watch": "npm run build:tsc -- --watch",
+    "obs:cloc": "mkdir -p .obs && while [ 1 ]; do cloc src --md --quiet --hide-rate | tail -n+5 | pandoc -f markdown --ascii > .obs/cloc.html; sleep 30; done"
   },
   "keywords": [],
   "author": "Andreas Brekken <andreas@brekken.com>",

@@ -6,9 +6,11 @@ import assert = require('assert');
 
 export const NAME = '@@order-book';
 
-export const ORDER_BOOK_INSERT_ACTION = `${NAME}/ORDER_BOOK_INSERT_ACTION`;
-export const ORDER_BOOK_REDUCE_ACTION = `${NAME}/ORDER_BOOK_REDUCE_ACTION`;
-export const ORDER_BOOK_REMOVE_ACTION = `${NAME}/ORDER_BOOK_REMOVE_ACTION`;
+export enum ActionType {
+  Insert = '@@order-book/INSERT_ACTION',
+  Reduce = '@@order-book/REDUCE_ACTION',
+  Remove = '@@order-book/REMOVE_ACTION',
+}
 
 export interface OrderBookEntry {
   readonly price: string;
@@ -26,10 +28,10 @@ export interface OrderBookInsertActionPayload {
 export interface OrderBookInsertAction extends ActionWithPayload<OrderBookInsertActionPayload> {}
 
 export const orderBookInsertAction = (payload: OrderBookInsertActionPayload) =>
-  createAction(ORDER_BOOK_INSERT_ACTION, payload);
+  createAction(ActionType.Insert, payload);
 
 export const isOrderBookInsertAction = (action: Action): action is OrderBookInsertAction =>
-  action.type === ORDER_BOOK_INSERT_ACTION;
+  action.type === ActionType.Insert;
 
 export interface OrderBookReduceActionPayload {
   readonly side: OrderSide;
@@ -40,10 +42,10 @@ export interface OrderBookReduceActionPayload {
 export interface OrderBookReduceAction extends ActionWithPayload<OrderBookReduceActionPayload> {}
 
 export const orderBookReduceAction = (payload: OrderBookReduceActionPayload) =>
-  createAction(ORDER_BOOK_REDUCE_ACTION, payload);
+  createAction(ActionType.Reduce, payload);
 
 export const isOrderBookReduceAction = (action: Action): action is OrderBookReduceAction =>
-  action.type === ORDER_BOOK_REDUCE_ACTION;
+  action.type === ActionType.Reduce;
 
 export interface OrderBookRemoveActionPayload {
   readonly side: OrderSide;
@@ -53,10 +55,10 @@ export interface OrderBookRemoveActionPayload {
 export interface OrderBookRemoveAction extends ActionWithPayload<OrderBookRemoveActionPayload> {}
 
 export const orderBookRemoveAction = (payload: OrderBookRemoveActionPayload) =>
-  createAction(ORDER_BOOK_REMOVE_ACTION, payload);
+  createAction(ActionType.Remove, payload);
 
 export const isOrderBookRemoveAction = (action: Action): action is OrderBookRemoveAction =>
-  action.type === ORDER_BOOK_REMOVE_ACTION;
+  action.type === ActionType.Remove;
 
 export interface OrderBookState {
   bids: OrderBookEntry[];

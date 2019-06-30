@@ -9,6 +9,7 @@ import {
   orderPartialFillAction,
   orderCancelAction,
   itemsReducer,
+  OrderStatus,
 } from './orders';
 import { capitalize } from 'lodash';
 import { OrderSide } from '../types';
@@ -57,7 +58,7 @@ describe('Orders', () => {
             price: '123',
             qty: '10',
             side: OrderSide.Buy,
-            status: 'New',
+            status: OrderStatus.New,
           } as Order,
         };
 
@@ -71,7 +72,7 @@ describe('Orders', () => {
             price: '50',
             qty: '20',
             side: OrderSide.Buy,
-            status: 'New',
+            status: OrderStatus.New,
           } as Order,
         };
 
@@ -89,7 +90,7 @@ describe('Orders', () => {
             price: '123',
             qty: '10',
             side: OrderSide.Buy,
-            status: 'New',
+            status: OrderStatus.New,
           } as Order,
         };
 
@@ -123,7 +124,7 @@ describe('Orders', () => {
             price: '123',
             qty: '10',
             side: OrderSide.Buy,
-            status: 'New',
+            status: OrderStatus.New,
           } as Order,
         };
 

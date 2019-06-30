@@ -2,7 +2,7 @@ import { expectSaga } from 'redux-saga-test-plan';
 import { placeOrderCommandHandler } from './command-handlers';
 import { PlaceOrderCommand, placeOrderCommand } from '../ducks/commands';
 import { reducer } from '../store';
-import { orderRestAction } from '../ducks/orders';
+import { orderRestAction, OrderStatus } from '../ducks/orders';
 import { NAME as ORDERS_NAME } from '../ducks/orders';
 import { NAME as ORDER_BOOK_NAME, orderBookInsertAction } from '../ducks/order-book';
 import { NAME as TRADES_NAME } from '../ducks/trades';
@@ -29,7 +29,7 @@ describe('Command handlers', () => {
                 price: '100',
                 qty: '10',
                 leavesQty: '10',
-                status: 'New',
+                status: OrderStatus.New,
               },
             },
           },

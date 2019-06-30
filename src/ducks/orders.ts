@@ -5,17 +5,14 @@ import { findIndex, flow, groupBy, chain, without, omit } from 'lodash';
 import assert = require('assert');
 import { select, put } from 'redux-saga/effects';
 
-export const NAME = '@@order';
+export const NAME = '@@orders';
 
-export const ORDER_REST_ACTION = `${NAME}/ORDER_REST_ACTION`;
-export const ORDER_FILL_ACTION = `${NAME}/ORDER_FILL_ACTION`;
-export const ORDER_PARTIAL_FILL_ACTION = `${NAME}/ORDER_PARTIAL_FILL_ACTION`;
-export const ORDER_CANCEL_ACTION = `${NAME}/ORDER_CANCEL_ACTION`;
-export const ORDER_INCR_SEQ_ACTION = `${NAME}/ORDER_INCR_SEQ_ACTION`;
-
-export const ORDER_STATUSES = <const>['New', 'PartiallyFilled', 'Filled', 'Canceled'];
-
-export type OrderStatus = typeof ORDER_STATUSES[number];
+export enum OrderStatus {
+  New = 'New',
+  PartiallyFilled = 'PartiallyFilled',
+  Filled = 'Filled',
+  Canceled = 'Canceled',
+}
 
 export interface Order {
   readonly id: string;
@@ -26,13 +23,21 @@ export interface Order {
   readonly leavesQty: string;
 }
 
+export enum ActionType {
+  OrderRest = '@@orders/ORDER_REST_ACTON',
+  OrderFill = '@@orders/ORDER_FILL_ACTION',
+  OrderPartialFill = '@@orders/ORDER_PARTIAL_FILL_ACTION',
+  OrderCancel = '@@orders/ORDER_CANCEL_ACTON',
+  IncrSeq = '@@orders/INCR_SEQ_ACTION',
+}
+
 export interface OrderRestActionPayload extends Omit<Order, 'status' | 'leavesQty'> {}
 
 export interface OrderRestAction extends ActionWithPayload<OrderRestActionPayload> {}
 
-export const orderRestAction = (payload: OrderRestActionPayload) => createAction(ORDER_REST_ACTION, payload);
+export const orderRestAction = (payload: OrderRestActionPayload) => createAction(ActionType.OrderRest, payload);
 
-export const isOrderRestAction = (action: Action): action is OrderRestAction => action.type === ORDER_REST_ACTION;
+export const isOrderRestAction = (action: Action): action is OrderRestAction => action.type === ActionType.OrderRest;
 
 export interface OrderFillActionPayload {
   readonly id: string;
@@ -40,9 +45,9 @@ export interface OrderFillActionPayload {
 
 export interface OrderFillAction extends ActionWithPayload<OrderFillActionPayload> {}
 
-export const orderFillAction = (payload: OrderFillActionPayload) => createAction(ORDER_FILL_ACTION, payload);
+export const orderFillAction = (payload: OrderFillActionPayload) => createAction(ActionType.OrderFill, payload);
 
-export const isOrderFillAction = (action: Action): action is OrderFillAction => action.type === ORDER_FILL_ACTION;
+export const isOrderFillAction = (action: Action): action is OrderFillAction => action.type === ActionType.OrderFill;
 
 export interface OrderPartialFillActionPayload {
   readonly id: string;
@@ -52,10 +57,10 @@ export interface OrderPartialFillActionPayload {
 export interface OrderPartialFillAction extends ActionWithPayload<OrderPartialFillActionPayload> {}
 
 export const orderPartialFillAction = (payload: OrderPartialFillActionPayload) =>
-  createAction(ORDER_PARTIAL_FILL_ACTION, payload);
+  createAction(ActionType.OrderPartialFill, payload);
 
 export const isOrderPartialFillAction = (action: Action): action is OrderPartialFillAction =>
-  action.type === ORDER_PARTIAL_FILL_ACTION;
+  action.type === ActionType.OrderPartialFill;
 
 export interface OrderCancelActionPayload {
   readonly id: string;
@@ -63,16 +68,17 @@ export interface OrderCancelActionPayload {
 
 export interface OrderCancelAction extends ActionWithPayload<OrderCancelActionPayload> {}
 
-export const orderCancelAction = (payload: OrderCancelActionPayload) => createAction(ORDER_CANCEL_ACTION, payload);
+export const orderCancelAction = (payload: OrderCancelActionPayload) => createAction(ActionType.OrderCancel, payload);
 
-export const isOrderCancelAction = (action: Action): action is OrderCancelAction => action.type === ORDER_CANCEL_ACTION;
+export const isOrderCancelAction = (action: Action): action is OrderCancelAction =>
+  action.type === ActionType.OrderCancel;
 
 export interface IncrOrderSeqAction extends Action {}
 
-export const incrOrderSeqAction = () => ({ type: ORDER_INCR_SEQ_ACTION });
+export const incrOrderSeqAction = () => createAction(ActionType.IncrSeq, undefined);
 
 export const isIncrOrderSeqAction = (action: Action): action is IncrOrderSeqAction =>
-  action.type === ORDER_INCR_SEQ_ACTION;
+  action.type === ActionType.IncrSeq;
 
 export type OrdersItemsState = {
   [id: string]: Order;
@@ -104,11 +110,11 @@ const getItems = flow(
 
 export const getOrder = (state: any, orderId: string) => state[NAME].items[orderId] as Order;
 
-const validatePreviousStatus = (previous: OrderStatus, next: Exclude<OrderStatus, 'New'>) => {
-  const valid: { [status in Exclude<OrderStatus, 'New'>]: OrderStatus[] } = {
-    PartiallyFilled: ['New', 'PartiallyFilled'],
-    Filled: ['New', 'PartiallyFilled'],
-    Canceled: ['New', 'PartiallyFilled', 'Filled'],
+const validatePreviousStatus = (previous: OrderStatus, next: Exclude<OrderStatus, OrderStatus.New>) => {
+  const valid: { [status in Exclude<OrderStatus, OrderStatus.New>]: OrderStatus[] } = {
+    PartiallyFilled: [OrderStatus.New, OrderStatus.PartiallyFilled],
+    Filled: [OrderStatus.New, OrderStatus.PartiallyFilled],
+    Canceled: [OrderStatus.New, OrderStatus.PartiallyFilled, OrderStatus.Filled],
   };
 
   const isValid = valid[next].includes(previous);
@@ -132,7 +138,7 @@ export const itemsReducer: Reducer<OrdersItemsState> = (state = initialItemsStat
       price,
       qty,
       leavesQty: qty,
-      status: 'New',
+      status: OrderStatus.New,
     };
 
     return {
@@ -150,12 +156,12 @@ export const itemsReducer: Reducer<OrdersItemsState> = (state = initialItemsStat
       throw new Error(`Order not found`);
     }
 
-    validatePreviousStatus(prevOrder.status, 'Filled');
+    validatePreviousStatus(prevOrder.status, OrderStatus.Filled);
 
     const nextOrder: Order = {
       ...prevOrder,
       leavesQty: '0',
-      status: 'Filled',
+      status: OrderStatus.Filled,
     };
 
     return {
@@ -173,7 +179,7 @@ export const itemsReducer: Reducer<OrdersItemsState> = (state = initialItemsStat
       throw new Error(`Order not found`);
     }
 
-    validatePreviousStatus(prevOrder.status, 'PartiallyFilled');
+    validatePreviousStatus(prevOrder.status, OrderStatus.PartiallyFilled);
 
     const nextLeavesQty = ns.minus(prevOrder.leavesQty, amount);
 
@@ -184,7 +190,7 @@ export const itemsReducer: Reducer<OrdersItemsState> = (state = initialItemsStat
     const nextOrder: Order = {
       ...prevOrder,
       leavesQty: nextLeavesQty,
-      status: 'PartiallyFilled',
+      status: OrderStatus.PartiallyFilled,
     };
 
     return {
@@ -202,12 +208,12 @@ export const itemsReducer: Reducer<OrdersItemsState> = (state = initialItemsStat
       throw new Error(`Order not found`);
     }
 
-    validatePreviousStatus(prevOrder.status, 'Canceled');
+    validatePreviousStatus(prevOrder.status, OrderStatus.Canceled);
 
     const nextOrder: Order = {
       ...prevOrder,
       leavesQty: '0',
-      status: 'Canceled',
+      status: OrderStatus.Canceled,
     };
 
     return {

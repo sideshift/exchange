@@ -6,9 +6,9 @@ import { flow, last } from 'lodash';
 
 export const NAME = '@@trades';
 
-export enum ActionTypes {
-  Trade = '@@trades/TRADE_ACTION',
-  IncrSeq = '@@trades/INCR_SEQ_ACTION',
+export enum ActionType {
+  Trade = '@@trades/TRADES_TRADE_ACTION',
+  IncrSeq = '@@trades/TRADES_INCR_SEQ_ACTION',
 }
 
 export interface Trade {
@@ -20,23 +20,23 @@ export interface Trade {
 
 export interface TradeActionPayload extends Trade {}
 
-export interface TradeAction extends ActionWithPayload<TradeActionPayload, ActionTypes.Trade> {}
+export interface TradeAction extends ActionWithPayload<TradeActionPayload, ActionType.Trade> {}
 
-export const tradeAction = (payload: TradeActionPayload) => createAction(ActionTypes.Trade, payload);
+export const tradeAction = (payload: TradeActionPayload) => createAction(ActionType.Trade, payload);
 
-export const isTradeAction = (action: Action<ActionTypes>): action is TradeAction => action.type === ActionTypes.Trade;
+export const isTradeAction = (action: Action<ActionType>): action is TradeAction => action.type === ActionType.Trade;
 
 export type TradesState = {
   readonly seq: number;
   readonly items: Trade[];
 };
 
-export interface IncrTradeSeqAction extends Action<ActionTypes.IncrSeq> {}
+export interface IncrTradeSeqAction extends Action<ActionType.IncrSeq> {}
 
-export const incrTradeSeqAction = () => ({ type: ActionTypes.IncrSeq });
+export const incrTradeSeqAction = () => ({ type: ActionType.IncrSeq });
 
-export const isIncrTradeSeqAction = (action: Action<ActionTypes>): action is IncrTradeSeqAction =>
-  action.type === ActionTypes.IncrSeq;
+export const isIncrTradeSeqAction = (action: Action<ActionType>): action is IncrTradeSeqAction =>
+  action.type === ActionType.IncrSeq;
 
 export const initialState: TradesState = { seq: 1, items: [] };
 

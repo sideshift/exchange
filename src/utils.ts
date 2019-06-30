@@ -1,12 +1,17 @@
 import { Action } from 'redux';
 import BigNumber from 'bignumber.js';
 import { call } from 'redux-saga/effects';
+import { ActionType as OrderActionType } from './ducks/orders';
+import { ActionType as OrderBookActionType } from './ducks/order-book';
+import { ActionType as TradeActionType } from './ducks/trades';
 
 export interface ActionWithPayload<T, P = never> extends Action<T> {
   readonly payload: P;
 }
 
-export function createAction<T extends string, P>(type: T, payload: P): ActionWithPayload<T, P> {
+export type ActionType = OrderActionType | OrderBookActionType | TradeActionType;
+
+export function createAction<P = any | undefined>(type: ActionType, payload: P): ActionWithPayload<ActionType, P> {
   return { type, payload };
 }
 

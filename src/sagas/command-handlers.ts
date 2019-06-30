@@ -14,6 +14,7 @@ import { SagaIterator } from 'redux-saga';
 import { claimOrderSeqSaga } from '.';
 import { OrderSide, TradeSide } from '../types';
 import { tradeEffect } from '../effects';
+import { tradeAction } from '../ducks/trades';
 
 export function* placeOrderCommandHandler(command: PlaceOrderCommand) {
   const seq: number = yield call(claimOrderSeqSaga);
@@ -71,7 +72,7 @@ export function* placeOrderCommandHandler(command: PlaceOrderCommand) {
 
     // Orders have been matched
     yield put(
-      tradeEffect({
+      tradeAction({
         price: counter.price,
         side: taker.side === OrderSide.Buy ? TradeSide.Buy : TradeSide.Sell, // TODO: Garbage
         size,

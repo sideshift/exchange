@@ -89,3 +89,4 @@ typings/
 
 dist/
 *.swp
+.obs

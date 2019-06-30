@@ -5,6 +5,7 @@ import { reducer } from '../store';
 import { orderRestAction } from '../ducks/orders';
 import { NAME as ORDERS_NAME } from '../ducks/orders';
 import { NAME as ORDER_BOOK_NAME, orderBookInsertAction } from '../ducks/order-book';
+import { Side } from '../types';
 
 describe('Command handlers', () => {
   describe('placeOrderCommandHandler', () => {
@@ -12,7 +13,7 @@ describe('Command handlers', () => {
       // NOTE: Yolo test while I figure out how to do this
 
       const command = placeOrderCommand({
-        side: 'Buy',
+        side: Side.Buy,
         price: '100',
         orderQty: '10',
       });
@@ -25,7 +26,7 @@ describe('Command handlers', () => {
             items: {
               '1': {
                 id: '1',
-                side: 'Buy',
+                side: Side.Buy,
                 price: '100',
                 qty: '10',
                 leavesQty: '10',
@@ -47,7 +48,7 @@ describe('Command handlers', () => {
         .put(
           orderRestAction({
             id: '1',
-            side: 'Buy',
+            side: Side.Buy,
             price: '100',
             qty: '10',
           })
@@ -55,7 +56,7 @@ describe('Command handlers', () => {
         .put(
           orderBookInsertAction({
             orderId: '1',
-            side: 'Buy',
+            side: Side.Buy,
             price: '100',
             size: '10',
           })

@@ -105,15 +105,15 @@ const entriesToL2 = (entries: OrderBookEntry[], side: Side) =>
           count: group.length,
         } as OrderBookL2Entry)
     )
-    .sort((a, b) => ns.cmp(a.price, b.price) * (side === 'Buy' ? -1 : 1))
+    .sort((a, b) => ns.cmp(a.price, b.price) * (side === Side.Buy ? -1 : 1))
     .value();
 
 export const getLevel2 = flow(
   getState,
   state =>
     ({
-      bids: entriesToL2(state.bids, 'Buy'),
-      offers: entriesToL2(state.offers, 'Sell'),
+      bids: entriesToL2(state.bids, Side.Buy),
+      offers: entriesToL2(state.offers, Side.Sell),
     } as OrderBookL2)
 );
 
@@ -127,7 +127,7 @@ export const reducer: Reducer<OrderBookState> = (state = initialState, action: A
       size,
     };
 
-    if (side === 'Buy') {
+    if (side === Side.Buy) {
       const { bids } = state;
 
       // The best (highest) bid is at the top of the book and the worst (lowest)
@@ -141,7 +141,7 @@ export const reducer: Reducer<OrderBookState> = (state = initialState, action: A
       };
     }
 
-    if (side === 'Sell') {
+    if (side === Side.Sell) {
       const { offers } = state;
 
       // The best (lowest) offer is at the top of the book and the worst (highest)
@@ -159,7 +159,7 @@ export const reducer: Reducer<OrderBookState> = (state = initialState, action: A
   if (isOrderBookReduceAction(action)) {
     const { side, orderId, amount } = action.payload;
 
-    const target = side === 'Buy' ? state.bids : state.offers;
+    const target = side === Side.Buy ? state.bids : state.offers;
     const index = findIndex(target, entry => entry.orderId === orderId);
 
     if (index === -1) {
@@ -175,14 +175,14 @@ export const reducer: Reducer<OrderBookState> = (state = initialState, action: A
 
     const nextEntries = [...target.slice(0, index), nextEntry, ...target.slice(index + 1)];
 
-    if (side === 'Buy') {
+    if (side === Side.Buy) {
       return {
         ...state,
         bids: nextEntries,
       };
     }
 
-    if (side === 'Sell') {
+    if (side === Side.Sell) {
       return {
         ...state,
         offers: nextEntries,
@@ -193,7 +193,7 @@ export const reducer: Reducer<OrderBookState> = (state = initialState, action: A
   if (isOrderBookRemoveAction(action)) {
     const { side, orderId } = action.payload;
 
-    const target = side === 'Buy' ? state.bids : state.offers;
+    const target = side === Side.Buy ? state.bids : state.offers;
     const index = findIndex(target, entry => entry.orderId === orderId);
 
     if (index === -1) {
@@ -202,14 +202,14 @@ export const reducer: Reducer<OrderBookState> = (state = initialState, action: A
 
     const nextEntries = [...target.slice(0, index), ...target.slice(index + 1)];
 
-    if (side === 'Buy') {
+    if (side === Side.Buy) {
       return {
         ...state,
         bids: nextEntries,
       };
     }
 
-    if (side === 'Sell') {
+    if (side === Side.Sell) {
       return {
         ...state,
         offers: nextEntries,

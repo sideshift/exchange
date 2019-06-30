@@ -12,6 +12,7 @@ import { ns } from '../utils';
 import { OrderBookEntry, getBestBid, getBestOffer, orderBookInsertAction } from '../ducks/order-book';
 import { SagaIterator } from 'redux-saga';
 import { claimOrderSeqSaga } from '.';
+import { Side } from '../types';
 
 export function* placeOrderCommandHandler(command: PlaceOrderCommand) {
   const seq: number = yield call(claimOrderSeqSaga);
@@ -39,12 +40,12 @@ export function* placeOrderCommandHandler(command: PlaceOrderCommand) {
       break;
     }
 
-    const counter: OrderBookEntry = yield select(taker.side === 'Buy' ? getBestOffer : getBestBid);
+    const counter: OrderBookEntry = yield select(taker.side === Side.Buy ? getBestOffer : getBestBid);
 
     if (
       counter === undefined ||
-      (taker.side === 'Buy' && ns.gt(counter.price, taker.price)) ||
-      (taker.side === 'Sell' && ns.lt(counter.price, taker.price))
+      (taker.side === Side.Buy && ns.gt(counter.price, taker.price)) ||
+      (taker.side === Side.Sell && ns.lt(counter.price, taker.price))
     ) {
       // Order will rest in the book
       yield put(

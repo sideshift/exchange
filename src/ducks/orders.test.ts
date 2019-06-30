@@ -20,7 +20,16 @@ const parseOrder = (value: string) => {
     throw new Error(`Invalid ${value} ${match && match.length}`);
   }
 
-  const side = upperFirst(match[1]) as Side;
+  let side: Side;
+
+  if (match[1].toLowerCase() === 'buy') {
+    side = Side.Buy;
+  } else if (match[1].toLowerCase() === 'sell') {
+    side = Side.Sell;
+  } else {
+    throw new Error(`Unknown side ${match[1]}`);
+  }
+
   const qty = match[2];
   const price = match[3];
   const idSuffix = match[4] || '';
@@ -47,7 +56,7 @@ describe('Orders', () => {
             leavesQty: '10',
             price: '123',
             qty: '10',
-            side: 'Buy',
+            side: Side.Buy,
             status: 'New',
           } as Order,
         };
@@ -61,7 +70,7 @@ describe('Orders', () => {
             leavesQty: '20',
             price: '50',
             qty: '20',
-            side: 'Buy',
+            side: Side.Buy,
             status: 'New',
           } as Order,
         };
@@ -79,7 +88,7 @@ describe('Orders', () => {
             leavesQty: '10',
             price: '123',
             qty: '10',
-            side: 'Buy',
+            side: Side.Buy,
             status: 'New',
           } as Order,
         };
@@ -93,7 +102,7 @@ describe('Orders', () => {
             leavesQty: '0',
             price: '123',
             qty: '10',
-            side: 'Buy',
+            side: Side.Buy,
             status: 'Filled',
           } as Order,
         };
@@ -113,7 +122,7 @@ describe('Orders', () => {
             leavesQty: '10',
             price: '123',
             qty: '10',
-            side: 'Buy',
+            side: Side.Buy,
             status: 'New',
           } as Order,
         };
@@ -127,7 +136,7 @@ describe('Orders', () => {
             leavesQty: '7',
             price: '123',
             qty: '10',
-            side: 'Buy',
+            side: Side.Buy,
             status: 'PartiallyFilled',
           } as Order,
         };
@@ -147,7 +156,7 @@ describe('Orders', () => {
             leavesQty: '5',
             price: '123',
             qty: '10',
-            side: 'Buy',
+            side: Side.Buy,
             status: 'PartiallyFilled',
           } as Order,
         };
@@ -161,7 +170,7 @@ describe('Orders', () => {
             leavesQty: '0',
             price: '123',
             qty: '10',
-            side: 'Buy',
+            side: Side.Buy,
             status: 'Canceled',
           } as Order,
         };

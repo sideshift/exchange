@@ -5,6 +5,6 @@ export interface ActionWithPayload<P> extends Action<string> {
 }
 
 export enum Side {
-  Buy = 'Buy',
-  Sell = 'Sell',
+  Buy = 'BUY',
+  Sell = 'SELL',
 }

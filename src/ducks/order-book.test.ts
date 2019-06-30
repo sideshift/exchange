@@ -10,7 +10,7 @@ import {
   NAME,
   OrderBookL2,
 } from './order-book';
-import { upperFirst, pick } from 'lodash';
+import { capitalize, pick } from 'lodash';
 import { Side } from '../types';
 
 const parseOrder = (value: string) => {
@@ -33,7 +33,7 @@ const parseOrder = (value: string) => {
   const size = match[2];
   const price = match[3];
   const orderIdSuffix = match[4] || '';
-  const orderId = `${side} ${size} @ ${price}${orderIdSuffix}`;
+  const orderId = `${capitalize(side)} ${size} @ ${price}${orderIdSuffix}`;
 
   return {
     orderId,

@@ -10,7 +10,7 @@ import {
   orderCancelAction,
   itemsReducer,
 } from './orders';
-import { upperFirst } from 'lodash';
+import { capitalize } from 'lodash';
 import { Side } from '../types';
 
 const parseOrder = (value: string) => {
@@ -33,7 +33,7 @@ const parseOrder = (value: string) => {
   const qty = match[2];
   const price = match[3];
   const idSuffix = match[4] || '';
-  const id = `${side} ${qty} @ ${price}${idSuffix}`;
+  const id = `${capitalize(side)} ${qty} @ ${price}${idSuffix}`;
 
   const order: OrderRestActionPayload = {
     id,

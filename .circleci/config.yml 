@@ -1,0 +1,14 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: node:10.16
+    steps:
+      - checkout
+      - run: npm install
+      - run: npm run build:tsc
+      - run:
+          name: "Run Jest and Collect Coverage Reports"
+          command: jest --collectCoverage=true
+      - store_artifacts:
+          path: coverage

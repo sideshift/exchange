@@ -5,6 +5,7 @@ import { reducer } from '../store';
 import { orderRestAction } from '../ducks/orders';
 import { NAME as ORDERS_NAME } from '../ducks/orders';
 import { NAME as ORDER_BOOK_NAME, orderBookInsertAction } from '../ducks/order-book';
+import { NAME as TRADES_NAME } from '../ducks/trades';
 import { OrderSide } from '../types';
 
 describe('Command handlers', () => {
@@ -41,6 +42,10 @@ describe('Command handlers', () => {
               },
             ],
             offers: [],
+          },
+          [TRADES_NAME]: {
+            seq: 1,
+            items: [],
           },
         })
         .put(

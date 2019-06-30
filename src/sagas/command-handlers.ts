@@ -12,7 +12,8 @@ import { ns } from '../utils';
 import { OrderBookEntry, getBestBid, getBestOffer, orderBookInsertAction } from '../ducks/order-book';
 import { SagaIterator } from 'redux-saga';
 import { claimOrderSeqSaga } from '.';
-import { OrderSide } from '../types';
+import { OrderSide, TradeSide } from '../types';
+import { tradeEffect } from '../effects';
 
 export function* placeOrderCommandHandler(command: PlaceOrderCommand) {
   const seq: number = yield call(claimOrderSeqSaga);
@@ -69,17 +70,13 @@ export function* placeOrderCommandHandler(command: PlaceOrderCommand) {
     const size = ns.min(taker.leavesQty, maker.leavesQty);
 
     // Orders have been matched
-    // TODO: Emit effect. No need to store this in reducer?
-
-    // yield put(
-    //   tradeAction({
-    //     price: counter.price,
-    //     side: taker.side,
-    //     size,
-    //     makerOrderId: maker.orderId,
-    //     takerOrderId: taker.orderId,
-    //   })
-    // );
+    yield put(
+      tradeEffect({
+        price: counter.price,
+        side: taker.side === OrderSide.Buy ? TradeSide.Buy : TradeSide.Sell, // TODO: Garbage
+        size,
+      })
+    );
 
     // Counter order has been filled
     if (ns.eq(size, maker.leavesQty)) {

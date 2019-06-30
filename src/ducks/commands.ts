@@ -1,5 +1,5 @@
 import { Action } from 'redux';
-import { Side } from '../types';
+import { OrderSide } from '../types';
 
 export const NAME = '@@commmand';
 
@@ -20,7 +20,7 @@ export interface Command<P = any> {
 }
 
 export interface PlaceOrderCommandPayload {
-  readonly side: Side;
+  readonly side: OrderSide;
   readonly price: string;
   readonly orderQty: string;
 }

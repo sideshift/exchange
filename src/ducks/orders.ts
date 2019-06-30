@@ -1,5 +1,5 @@
 import { Reducer, Action, AnyAction } from 'redux';
-import { ActionWithPayload, Side } from '../types';
+import { ActionWithPayload, OrderSide } from '../types';
 import { createAction, ns } from '../utils';
 import { findIndex, flow, groupBy, chain, without, omit } from 'lodash';
 import assert = require('assert');
@@ -19,7 +19,7 @@ export type OrderStatus = typeof ORDER_STATUSES[number];
 
 export interface Order {
   readonly id: string;
-  readonly side: Side;
+  readonly side: OrderSide;
   readonly price: string;
   readonly status: OrderStatus;
   readonly qty: string;

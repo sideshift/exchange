@@ -4,7 +4,7 @@ export interface ActionWithPayload<P> extends Action<string> {
   payload: P;
 }
 
-export enum Side {
+export enum OrderSide {
   Buy = 'BUY',
   Sell = 'SELL',
 }

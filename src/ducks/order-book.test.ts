@@ -11,7 +11,7 @@ import {
   OrderBookL2,
 } from './order-book';
 import { capitalize, pick } from 'lodash';
-import { Side } from '../types';
+import { OrderSide } from '../types';
 
 const parseOrder = (value: string) => {
   const match = value.match(/^(buy|sell) ([0-9\.]+) *@ *([0-9\.]+)(.+)?$/i);
@@ -20,12 +20,12 @@ const parseOrder = (value: string) => {
     throw new Error(`Invalid ${value} ${match && match.length}`);
   }
 
-  let side: Side;
+  let side: OrderSide;
 
   if (match[1].toLowerCase() === 'buy') {
-    side = Side.Buy;
+    side = OrderSide.Buy;
   } else if (match[1].toLowerCase() === 'sell') {
-    side = Side.Sell;
+    side = OrderSide.Sell;
   } else {
     throw new Error(`Unknown side ${match[1]}`);
   }
@@ -169,7 +169,7 @@ describe('OrderBook', () => {
           orderBookReduceAction({
             orderId: 'Buy 20 @ 200',
             amount: '3',
-            side: Side.Buy,
+            side: OrderSide.Buy,
           })
         );
 
@@ -203,7 +203,7 @@ describe('OrderBook', () => {
           orderBookReduceAction({
             orderId: 'Sell 20 @ 200',
             amount: '3',
-            side: Side.Sell,
+            side: OrderSide.Sell,
           })
         );
 
@@ -238,7 +238,7 @@ describe('OrderBook', () => {
             orderBookReduceAction({
               orderId: 'Buy 5 @ 50',
               amount: '3',
-              side: Side.Buy,
+              side: OrderSide.Buy,
             })
           )
         ).toThrow(/not found/);
@@ -260,7 +260,7 @@ describe('OrderBook', () => {
             orderBookReduceAction({
               orderId: 'Buy 10 @ 100',
               amount: '10',
-              side: Side.Buy,
+              side: OrderSide.Buy,
             })
           )
         ).toThrow(/<= 0/);
@@ -282,7 +282,7 @@ describe('OrderBook', () => {
             orderBookReduceAction({
               orderId: 'Buy 10 @ 100',
               amount: '20',
-              side: Side.Buy,
+              side: OrderSide.Buy,
             })
           )
         ).toThrow(/<= 0/);
@@ -304,7 +304,7 @@ describe('OrderBook', () => {
             orderBookReduceAction({
               orderId: 'Sell 5 @ 50',
               amount: '3',
-              side: Side.Sell,
+              side: OrderSide.Sell,
             })
           )
         ).toThrow(/not found/);
@@ -326,7 +326,7 @@ describe('OrderBook', () => {
             orderBookReduceAction({
               orderId: 'Sell 10 @ 100',
               amount: '10',
-              side: Side.Sell,
+              side: OrderSide.Sell,
             })
           )
         ).toThrow(/<= 0/);
@@ -348,7 +348,7 @@ describe('OrderBook', () => {
             orderBookReduceAction({
               orderId: 'Sell 10 @ 100',
               amount: '20',
-              side: Side.Sell,
+              side: OrderSide.Sell,
             })
           )
         ).toThrow(/<= 0/);
@@ -371,7 +371,7 @@ describe('OrderBook', () => {
             prevState,
             orderBookRemoveAction({
               orderId: 'Buy 5 @ 50',
-              side: Side.Buy,
+              side: OrderSide.Buy,
             })
           )
         ).toThrow(/not found/);
@@ -392,7 +392,7 @@ describe('OrderBook', () => {
             prevState,
             orderBookRemoveAction({
               orderId: 'Sell 5 @ 50',
-              side: Side.Sell,
+              side: OrderSide.Sell,
             })
           )
         ).toThrow(/not found/);

@@ -5,7 +5,7 @@ import { log } from '../utils';
 import { expectSaga, testSaga } from 'redux-saga-test-plan';
 import * as db from '../db';
 import { END } from 'redux-saga';
-import { Side } from '../types';
+import { OrderSide } from '../types';
 
 const expectToEqualAsJson = (actual: any, expected: any) => {
   const actualCleaned = JSON.parse(JSON.stringify(actual));
@@ -18,7 +18,7 @@ describe('sagas', () => {
     describe('processCommandSaga', () => {
       it('should run', async () => {
         const command = placeOrderCommand({
-          side: Side.Buy,
+          side: OrderSide.Buy,
           price: '123.444',
           orderQty: '999.01',
         });
@@ -34,7 +34,7 @@ describe('sagas', () => {
       it('should run', async () => {
         const command = placeOrderCommand(
           {
-            side: Side.Buy,
+            side: OrderSide.Buy,
             price: '123.444',
             orderQty: '999.01',
           },
@@ -65,7 +65,7 @@ describe('sagas', () => {
     describe('commandWatcherSaga', () => {
       it('should run', async () => {
         const command = placeOrderCommand({
-          side: Side.Buy,
+          side: OrderSide.Buy,
           price: '123.444',
           orderQty: '999.01',
         });

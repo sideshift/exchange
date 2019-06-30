@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const bignumber_js_1 = __importDefault(require("bignumber.js"));
+const effects_1 = require("redux-saga/effects");
 function createAction(type, payload) {
     return { type, payload };
 }
@@ -21,3 +22,5 @@ exports.ns = {
     eq: (a, b) => exports.n(a).eq(b),
     cmp: (a, b) => exports.n(a).comparedTo(b),
 };
+exports.log = (...args) => effects_1.call(console.log.bind(console), ...args);
+//# sourceMappingURL=utils.js.map

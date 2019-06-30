@@ -82,6 +82,16 @@ export interface OrderBookL2 {
 
 const getState = (state: any) => state[NAME] as OrderBookState;
 
+export const getBestBid = flow(
+  getState,
+  state => state.bids[0]
+);
+
+export const getBestOffer = flow(
+  getState,
+  state => state.offers[0]
+);
+
 // TODO: Terrible performance. Does not know it's sorted
 const entriesToL2 = (entries: OrderBookEntry[], side: Side) =>
   chain(entries)

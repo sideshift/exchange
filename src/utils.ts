@@ -1,5 +1,6 @@
 import { Action } from 'redux';
 import BigNumber from 'bignumber.js';
+import { call } from 'redux-saga/effects';
 
 export interface ActionWithPayload<T, P = never> extends Action<T> {
   readonly payload: P;
@@ -24,3 +25,8 @@ export const ns = {
   eq: (a: BigNumber.Value, b: BigNumber.Value) => n(a).eq(b),
   cmp: (a: BigNumber.Value, b: BigNumber.Value) => n(a).comparedTo(b),
 };
+
+export const log = (...args: any[]) => call(console.log.bind(console), ...args);
+
+// Gives you the type of a field K in type T
+export type FieldType<T, K extends keyof T> = T[K];

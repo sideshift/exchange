@@ -1,13 +1,14 @@
 import {
   reducer,
-  initialState,
+  initialItemsState,
   OrderRestActionPayload,
   Order,
   orderRestAction,
-  OrdersState,
-  OrderFillAction,
-  OrderPartialFillAction,
+  OrdersItemsState,
+  orderFillAction,
+  orderPartialFillAction,
   orderCancelAction,
+  itemsReducer,
 } from './orders';
 import { upperFirst } from 'lodash';
 import { Side } from '../types';
@@ -36,11 +37,11 @@ const parseOrder = (value: string) => {
 };
 
 describe('Orders', () => {
-  describe('reducer', () => {
+  describe('itemsReducer', () => {
     describe('Rest', () => {
       it('Should rest order', () => {
-        const prevState: OrdersState = {
-          ...initialState,
+        const prevState: OrdersItemsState = {
+          ...initialItemsState,
           'order-a': {
             id: 'order-a',
             leavesQty: '10',
@@ -51,9 +52,9 @@ describe('Orders', () => {
           } as Order,
         };
 
-        const nextState = reducer(prevState, orderRestAction(parseOrder('Buy 20 @ 50')));
+        const nextState = itemsReducer(prevState, orderRestAction(parseOrder('Buy 20 @ 50')));
 
-        const expectedState: OrdersState = {
+        const expectedState: OrdersItemsState = {
           ...prevState,
           'Buy 20 @ 50': {
             id: 'Buy 20 @ 50',
@@ -71,8 +72,8 @@ describe('Orders', () => {
 
     describe('Fill', () => {
       it('Should fill order', () => {
-        const prevState: OrdersState = {
-          ...initialState,
+        const prevState: OrdersItemsState = {
+          ...initialItemsState,
           'Buy 10 @ 123': {
             id: 'Buy 10 @ 123',
             leavesQty: '10',
@@ -83,9 +84,9 @@ describe('Orders', () => {
           } as Order,
         };
 
-        const nextState = reducer(prevState, OrderFillAction({ id: 'Buy 10 @ 123' }));
+        const nextState = itemsReducer(prevState, orderFillAction({ id: 'Buy 10 @ 123' }));
 
-        const expectedState: OrdersState = {
+        const expectedState: OrdersItemsState = {
           ...prevState,
           'Buy 10 @ 123': {
             id: 'Buy 10 @ 123',
@@ -105,8 +106,8 @@ describe('Orders', () => {
       it('Should partially fill order', () => {
         const id = 'Buy 10 @ 123';
 
-        const prevState: OrdersState = {
-          ...initialState,
+        const prevState: OrdersItemsState = {
+          ...initialItemsState,
           [id]: {
             id,
             leavesQty: '10',
@@ -117,9 +118,9 @@ describe('Orders', () => {
           } as Order,
         };
 
-        const nextState = reducer(prevState, OrderPartialFillAction({ id, amount: '3' }));
+        const nextState = itemsReducer(prevState, orderPartialFillAction({ id, amount: '3' }));
 
-        const expectedState: OrdersState = {
+        const expectedState: OrdersItemsState = {
           ...prevState,
           [id]: {
             id,
@@ -139,8 +140,8 @@ describe('Orders', () => {
       it('Should cancel order', () => {
         const id = 'Buy 10 @ 123';
 
-        const prevState: OrdersState = {
-          ...initialState,
+        const prevState: OrdersItemsState = {
+          ...initialItemsState,
           [id]: {
             id,
             leavesQty: '5',
@@ -151,9 +152,9 @@ describe('Orders', () => {
           } as Order,
         };
 
-        const nextState = reducer(prevState, orderCancelAction({ id }));
+        const nextState = itemsReducer(prevState, orderCancelAction({ id }));
 
-        const expectedState: OrdersState = {
+        const expectedState: OrdersItemsState = {
           ...prevState,
           [id]: {
             id,

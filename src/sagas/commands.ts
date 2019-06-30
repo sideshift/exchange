@@ -1,29 +1,40 @@
 import { isCommand, Command } from '../ducks/commands';
-import { take, call, select } from 'redux-saga/effects';
+import { take, call, select, put, SimpleEffect } from 'redux-saga/effects';
+import * as db from '../db';
+import { log } from '../utils';
+import assert = require('assert');
 
-// TODO: Dummy for mock
-export const processCommandSaga = function*(command: Command) {
-  const state = yield select(state => state);
-  console.log('yolo', state);
+export const processCommandSaga = function*(command: Command): IterableIterator<any> {
+  assert(command);
 };
 
 export const commandWorkerSaga = function*(command: Command) {
-  let seq = 0; // TODO: Remove me!
+  assert(command, 'command');
 
-  // TODO: Feels weird. Use a meta field?
-  command.payload.seq = ++seq;
+  if (command.meta.seq === undefined) {
+    throw new Error(`seq missing from command meta`);
+  }
 
-  // TODO: Persist command (can fork if it joins back after).
-  //Can store in variable here
-
-  yield call(console.log.bind(console), 'Sequenced command', command.payload.seq);
-
+  // TODO: Persist command (can fork if it joins back after in correct order)
+  // maybe using a channel?
+  yield call(db.persistCommand, command);
   yield call(processCommandSaga, command);
 };
 
 export const commandWatcherSaga = function*() {
+  let seq: number = yield call(db.restoreCommandSeq);
+
   while (true) {
-    const command = yield take(isCommand);
+    const command: Command = yield take<Command>(isCommand);
+
+    if (command.meta.seq !== undefined) {
+      throw new Error(`Command sequenced too early`);
+    }
+
+    const commandSequenced: Command = { ...command, meta: { ...command.meta, seq } };
+
+    seq += 1;
+
+    yield call(commandWorkerSaga, commandSequenced);
   }
-  //x
 };
